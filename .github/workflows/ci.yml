@@ -12,26 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
-      - name: Install package
-        run: |
-          uv venv
-          uv pip install -e . pytest
-      - name: Install xtcocotools (reference implementation)
-        # xtcocotools' setup.py imports numpy and compiles Cython at build
-        # time without declaring either as a build dependency, so it cannot be
-        # built in an isolated PEP 517 environment.
-        run: |
-          uv pip install numpy "cython>=3" setuptools wheel
-          uv pip install --no-build-isolation xtcocotools
-      - name: Test
-        run: .venv/bin/python -m pytest -q
+      - run: uv venv && uv pip install -e . pytest git+https://github.com/jin-s13/xtcocoapi
+      - run: .venv/bin/python -m pytest -q
 
   build:
     runs-on: ubuntu-latest
@@ -50,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write  # PyPI trusted publishing
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:

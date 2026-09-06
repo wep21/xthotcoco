@@ -9,7 +9,7 @@ description = "xtcocotools-compatible COCO-WholeBody / CrowdPose keypoint evalua
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [{ name = "Daisuke Nishimatsu" }]
 keywords = ["coco", "keypoints", "wholebody", "crowdpose", "evaluation", "hotcoco", "xtcocotools"]
 classifiers = [
