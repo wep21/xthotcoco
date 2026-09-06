@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install package
+        run: |
+          uv venv
+          uv pip install -e . pytest
+      - name: Install xtcocotools (reference implementation)
+        # xtcocotools' setup.py imports numpy and compiles Cython at build
+        # time without declaring either as a build dependency, so it cannot be
+        # built in an isolated PEP 517 environment.
+        run: |
+          uv pip install numpy "cython>=3" setuptools wheel
+          uv pip install --no-build-isolation xtcocotools
+      - name: Test
+        run: .venv/bin/python -m pytest -q
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # PyPI trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: astral-sh/setup-uv@v6
+      - run: uv publish --trusted-publishing always

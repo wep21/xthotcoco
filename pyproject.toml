@@ -1,0 +1,33 @@
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "xthotcoco"
+version = "0.1.0"
+description = "xtcocotools-compatible COCO-WholeBody / CrowdPose keypoint evaluation on top of hotcoco's Rust engine"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [{ name = "Daisuke Nishimatsu" }]
+keywords = ["coco", "keypoints", "wholebody", "crowdpose", "evaluation", "hotcoco", "xtcocotools"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+]
+# hotcoco is pinned to the 1.x line: xthotcoco relies on Params.kpt_oks_sigmas,
+# Params.imgIds, eval["precision"], loadRes honoring an explicit bbox, and
+# num_keypoints-based GT ignore — all pycocotools-compatible surfaces.
+dependencies = [
+  "hotcoco>=1.0,<2",
+  "numpy>=1.22",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "xtcocotools"]
+
+[project.urls]
+Homepage = "https://github.com/wep21/xthotcoco"
+Repository = "https://github.com/wep21/xthotcoco"
